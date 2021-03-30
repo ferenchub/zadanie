@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Arr;
 
@@ -17,7 +16,7 @@ class SitesController extends Controller
                 $traffic = $site['traffic'];
                 $quality = $site['quality'];
                 $price = $site['price'];
-                dump($site);
+//                dump($site);
             }
         }
         $array2 = [];
@@ -36,8 +35,8 @@ class SitesController extends Controller
         }
 
         $sorted = Arr::sortRecursive($result);
-//        return response()->json($sorted);
-        dd($sorted);
+        return response()->json($sorted);
+//        dd($sorted);
     }
 
     function getClosest($search, $arr): array
@@ -52,7 +51,9 @@ class SitesController extends Controller
         }
         return [$arra, $new];
     }
-    public function other(){
+
+    public function other()
+    {
         $response = Http::get('https://app.linkhouse.co/rekrutacja/strony');
         $requested_site = $response->json()['requested_site'];
         foreach ($response->json()['sites'] as $site) {
@@ -60,31 +61,30 @@ class SitesController extends Controller
                 $traffic = $site['traffic'];
                 $quality = $site['quality'];
                 $price = $site['price'];
-                dump($site);
+//                dump($site);
             }
         }
-        $factor = $site['traffic'] + $site['quality'] + $site['price'];
+        $factor = $traffic + $quality + $price;
         $array2 = [];
         foreach ($response->json()['sites'] as $sites) {
-            if ($sites['price'] == $price || $sites['quality'] == $quality) {
-                $factor_n = $sites['price'] + $sites['quality'] + $sites['traffic'];
-                if ($sites['site'] != $requested_site) {
-                    $sites = Arr::prepend($sites, $factor_n);
-                    $array2 = Arr::prepend($array2, $sites);
-                }
+            $factor_n = $sites['price'] + $sites['quality'] + $sites['traffic'];
+            if ($sites['site'] != $requested_site) {
+                $sites = Arr::prepend($sites, $factor_n);
+                $array2 = Arr::prepend($array2, $sites);
             }
         }
         $result = [];
         for ($i = 1; $i <= 10; $i++) {
-            $reply = $this->getClosest($traffic, $array2);
+            $reply = $this->getClosest($factor, $array2);
             $result = Arr::prepend($result, $reply[0]);
             Arr::forget($array2, $reply[1]);
         }
 
         $sorted = Arr::sortRecursive($result);
-//        return response()->json($sorted);
-        dd($sorted);
+        return response()->json($sorted);
+//        dd($sorted);
     }
+
     function getClosestFactor($search, $arr): array
     {
         $closest = null;
