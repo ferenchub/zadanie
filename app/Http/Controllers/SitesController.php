@@ -7,7 +7,7 @@ use Illuminate\Support\Arr;
 
 class SitesController extends Controller
 {
-    public function index()
+    public function index(): \Illuminate\Http\JsonResponse
     {
         $response = Http::get('https://app.linkhouse.co/rekrutacja/strony');
         $requested_site = $response->json()['requested_site'];
@@ -52,7 +52,7 @@ class SitesController extends Controller
         return [$arra, $new];
     }
 
-    public function other()
+    public function other(): \Illuminate\Http\JsonResponse
     {
         $response = Http::get('https://app.linkhouse.co/rekrutacja/strony');
         $requested_site = $response->json()['requested_site'];
